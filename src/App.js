@@ -1,19 +1,17 @@
 import Card from './components/Card';
-import Drawer from './components/Drawer';
+import Cart from './components/Cart';
 import Header from './components/Header';
-
-const arr = [
-  { title: 'Мужские кроссовки Nike Blazer Mid Suede', price: 12999, url: '/img/sneakers/1.jpg' },
-  { title: 'Мужские кроссовки Nike Air Max 270', price: 15600, url: '/img/sneakers/2.jpg' },
-  { title: 'Мужские кроссовки Nike Blazer Mid Suede', price: 10999, url: '/img/sneakers/3.jpg' },
-  { title: 'Мужские кроссовки Puma X Aka', price: 8999, url: '/img/sneakers/8.jpg' },
-]
+import { useShopContext } from './context/shopContext';
 
 function App() {
+  const { items, isCartOpened, itemsInCart, handleCart, addToCart } = useShopContext();
+
   return (
     <div className="wrapper clear">
-      <Drawer />
-      <Header />
+      {isCartOpened && <Cart handleCart={handleCart} itemsInCart={itemsInCart} />}
+
+      <Header handleCart={handleCart} />
+
       <div className="content p-40">
         <div className="d-flex align-center justify-between mb-40">
           <h1>Все кроссовки</h1>
@@ -22,14 +20,15 @@ function App() {
             <input placeholder="Поиск..."></input>
           </div>
         </div>
-        <div className="d-flex">
+        <div className="d-flex flex-wrap">
           {
-            arr.length ?
-              arr.map((elem, index) => <Card 
-                key={index} 
-                title={elem.title} 
-                price={elem.price} 
-                url={elem.url}
+            items.length ?
+              items.map((elem, index) => <Card
+                key={index}
+                title={elem.title}
+                price={elem.price}
+                imageUrl={elem.imageUrl}
+                addToCart={() => addToCart(elem)}
               />)
               :
               <p>В магазине нет кроссовок</p>
