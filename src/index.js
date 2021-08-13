@@ -5,8 +5,13 @@ import './index.scss';
 import 'macro-css';
 
 import App from './App';
+import ShopContextProvider from './context/shopContext';
 
 ReactDOM.render(
-  <App />,
+  <React.StrictMode>
+      <ShopContextProvider>
+        <App />
+      </ShopContextProvider>
+  </React.StrictMode>,
   document.getElementById('root')
 );
