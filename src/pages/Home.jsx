@@ -2,7 +2,21 @@ import Card from "../components/Card";
 import { useShopContext } from "../context/shopContext";
 
 function Home() {
-    const { items, addToCart, addToFavourites, searchValue, onChangeSearchInput, clearSearchInput } = useShopContext();
+    const { isLoading, items, addToCart, addToFavourites, searchValue, onChangeSearchInput, clearSearchInput } = useShopContext();
+
+    function renderItems() {
+        const filteredItems = items.filter(item => item.title.toLowerCase().includes(searchValue.toLowerCase()));
+
+        return (isLoading ? [...Array(8)] : filteredItems).map((elem, index) => (
+            <Card
+                key={index}
+                {...elem}
+                loading={isLoading}
+                addToCart={() => addToCart(elem)}
+                addToFavourites={() => addToFavourites(elem)}
+            />
+        ));
+    }
 
     return (
         <div className="content p-40">
@@ -23,17 +37,7 @@ function Home() {
             </div>
             <div className="d-flex flex-wrap">
                 {
-                    items.length ?
-                        items
-                            .filter(item => item.title.toLowerCase().includes(searchValue.toLowerCase()))
-                            .map(elem => <Card
-                                key={elem.id}
-                                {...elem}
-                                addToCart={() => addToCart(elem)}
-                                addToFavourites={() => addToFavourites(elem)}
-                            />)
-                        :
-                        <p>В магазине нет кроссовок</p>
+                    renderItems()
                 }
             </div>
         </div>
