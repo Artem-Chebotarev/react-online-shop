@@ -9,12 +9,13 @@ const ShopContextProvider = ({ children }) => {
     const [itemsInCart, setItemsInCart] = useState([]);
     const [itemsInFavourites, setItemsInFavourites] = useState([]);
     const [searchValue, setSearchValue] = useState('');
+    const [isLoading, setIsLoading] = useState(true);
 
-    function onChangeSearchInput(event) {
+    const onChangeSearchInput = (event) => {
         setSearchValue(event.target.value);
     }
 
-    function clearSearchInput() {
+    const clearSearchInput = () => {
         setSearchValue('');
     }
 
@@ -23,8 +24,17 @@ const ShopContextProvider = ({ children }) => {
     }
 
     const addToCart = (elem) => {
-        if (itemsInCart.some(item => item.id === elem.id)) {
-            setItemsInCart(prev => prev.filter(item => item.id !== elem.id));
+        const id = elem.id;
+
+        if (itemsInCart.find(item => Number(item.id) === Number(id))) {
+            fetch(`https://6117822b30022f0017a05e3f.mockapi.io/cart/${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json;charset=utf-8'
+                },
+                body: JSON.stringify({ id }),
+            })
+            setItemsInCart(prev => prev.filter(item => Number(item.id) !== Number(id)));
         } else {
             fetch('https://6117822b30022f0017a05e3f.mockapi.io/cart', {
                 method: 'POST',
@@ -33,7 +43,10 @@ const ShopContextProvider = ({ children }) => {
                 },
                 body: JSON.stringify(elem)
             })
-            setItemsInCart(prev => [...prev, elem]);
+                .then(res => res.json())
+                .then(elem => setItemsInCart(prev => [...prev, elem]))
+                .catch(() => alert('Не удалось добавить в корзину'))
+            // setItemsInCart(prev => [...prev, elem]);
         }
     }
 
@@ -68,23 +81,35 @@ const ShopContextProvider = ({ children }) => {
                 },
                 body: JSON.stringify(elem)
             })
-            .then(res => res.json())
-            .then(elem => setItemsInFavourites(prev => [...prev, elem]))
-            .catch(() => alert('Не удалось добавить в фавориты'))
+                .then(res => res.json())
+                .then(elem => setItemsInFavourites(prev => [...prev, elem]))
+                .catch(() => alert('Не удалось добавить в фавориты'))
         }
     }
 
-    useEffect(() => {
-        fetch('https://6117822b30022f0017a05e3f.mockapi.io/items')
-            .then(res => res.json())
-            .then(itemsFromServer => setItems(itemsFromServer))
+    const isItemAdded = (id) => {
+        return itemsInCart.some(item => Number(item.id) === Number(id));
+    }
 
-        fetch('https://6117822b30022f0017a05e3f.mockapi.io/cart')
-            .then(res => res.json())
-            .then(itemsInCartFromServer => setItemsInCart(itemsInCartFromServer))
-        fetch('https://6117822b30022f0017a05e3f.mockapi.io/favourites')
-            .then(res => res.json())
-            .then(itemsInFavouritesFromServer => setItemsInFavourites(itemsInFavouritesFromServer))
+    useEffect(() => {
+        async function fetchData() {
+            const responseCart = await fetch('https://6117822b30022f0017a05e3f.mockapi.io/cart')
+            const itemsInCartFromServer = await responseCart.json();
+
+            const responseFavourites = await fetch('https://6117822b30022f0017a05e3f.mockapi.io/favourites')
+            const itemsInFavouritesFromServer = await responseFavourites.json();
+
+            const responseItems = await fetch('https://6117822b30022f0017a05e3f.mockapi.io/items')
+            const itemsFromServer = await responseItems.json();
+
+            setIsLoading(false);
+
+            setItemsInCart(itemsInCartFromServer);
+            setItemsInFavourites(itemsInFavouritesFromServer);
+            setItems(itemsFromServer);
+        }
+
+        fetchData();
     }, []);
 
     return (
@@ -94,12 +119,16 @@ const ShopContextProvider = ({ children }) => {
             isCartOpened,
             itemsInCart,
             itemsInFavourites,
+            isLoading,
             onChangeSearchInput,
             clearSearchInput,
             handleCart,
             addToCart,
             removeFromCart,
             addToFavourites,
+            isItemAdded,
+            setItemsInCart,
+            setIsCartOpened,
         }} >
             {children}
         </shopContext.Provider>
