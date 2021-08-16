@@ -1,5 +1,8 @@
-# Online shop was developed by using React, React Context, React Router, SCSS, CSS modules
+# [react-online-shop](https://artem-chebotarev.github.io/react-online-shop/) || Интернет-магазин кроссовок
 
+<p align="center">
+  <img src="books.png" width="350" alt="accessibility text">
+</p>
 
 In the project directory, you can run:
 
