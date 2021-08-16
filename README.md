@@ -1,7 +1,7 @@
 # [react-online-shop](https://artem-chebotarev.github.io/react-online-shop/) || Интернет-магазин кроссовок
 
 <p align="center">
-  <img src="starting-page.png" width="350" alt="accessibility text">
+  <img src="starting-page.png" width="700" alt="accessibility text">
 </p>
 
 In the project directory, you can run:
