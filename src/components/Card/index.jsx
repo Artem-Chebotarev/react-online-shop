@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import ContentLoader from 'react-content-loader';
 import { useShopContext } from '../../context/shopContext';
 import styles from './Card.module.scss';
@@ -11,19 +10,18 @@ function Card({
   imageUrl,
   addToCart,
   addToFavourites,
-  isInFavourites = false,
 }) {
-  const [isFavourite, setIsFavourite] = useState(isInFavourites);
 
-  const { isItemAdded } = useShopContext();
+  const { isItemAdded, isItemFavourite } = useShopContext();
+
+  const obj = { id, parentId: id, title, price, imageUrl };
 
   function onClickPlus() {
-    addToCart({ id, title, price, imageUrl });
+    addToCart(obj);
   }
 
   function onClickFavourite() {
-    addToFavourites({ id, title, price, imageUrl });
-    setIsFavourite(!isFavourite);
+    addToFavourites(obj);
   }
 
   return (
@@ -45,12 +43,12 @@ function Card({
           </ContentLoader>)
           :
           <>
-            <div className={styles.favourite}>
+            {addToFavourites && <div className={styles.favourite}>
               <img
                 onClick={onClickFavourite}
-                src={isFavourite ? "/img/liked.svg" : "/img/unliked.svg"}
+                src={isItemFavourite(id) ? "/img/liked.svg" : "/img/unliked.svg"}
                 alt="Like" />
-            </div>
+            </div>}
             <img width={133} height={112} src={imageUrl} alt="Sneaker" />
             <h5>{title}</h5>
             <div className="d-flex justify-between align-center">
@@ -58,12 +56,12 @@ function Card({
                 <span>Цена:</span>
                 <b>{price} руб.</b>
               </div>
-              <img
+              {addToCart && <img
                 className={styles.plus}
                 onClick={onClickPlus}
                 src={isItemAdded(id) ? "/img/btn-checked.svg" : "/img/btn-plus.svg"}
                 alt="Plus"
-              />
+              />}
             </div>
           </>
       }

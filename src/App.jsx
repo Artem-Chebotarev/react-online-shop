@@ -3,11 +3,11 @@ import Header from './components/Header';
 import { useShopContext } from './context/shopContext';
 import {
   BrowserRouter as Router,
-  Route,
-  Switch
+  Route
 } from 'react-router-dom';
 import Home from './pages/Home';
 import Favourites from './pages/Favourites';
+import Orders from './pages/Orders';
 
 function App() {
   const { isCartOpened, handleCart } = useShopContext();
@@ -15,17 +15,22 @@ function App() {
   return (
     <div className="wrapper clear">
       <Router>
-        {isCartOpened && <Cart handleCart={handleCart} />}
+        <Cart handleCart={handleCart} opened={isCartOpened} />
 
         <Header handleCart={handleCart} />
+
+        <Route exact path="/">
+          <Home />
+        </Route>
 
         <Route exact path="/favourites">
           <Favourites />
         </Route>
 
-        <Route exact path="/">
-          <Home />
+        <Route exact path="/orders">
+          <Orders />
         </Route>
+
       </Router>
     </div>
   );
