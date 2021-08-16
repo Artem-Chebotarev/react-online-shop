@@ -1,4 +1,4 @@
-# Online shop using React, React Context, React Router, SCSS, CSS modules
+# Online shop was developed by using React, React Context, React Router, SCSS, CSS modules
 
 
 In the project directory, you can run:
