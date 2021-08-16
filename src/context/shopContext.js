@@ -25,17 +25,21 @@ const ShopContextProvider = ({ children }) => {
 
     const addToCart = (elem) => {
         const id = elem.id;
+        const findItem = itemsInCart.find(item => Number(item.parentId) === Number(id));
 
-        if (itemsInCart.find(item => Number(item.id) === Number(id))) {
-            fetch(`https://6117822b30022f0017a05e3f.mockapi.io/cart/${id}`, {
+        if (findItem) {
+            setItemsInCart(prev => prev.filter(item => Number(item.parentId) !== Number(id)));
+
+            fetch(`https://6117822b30022f0017a05e3f.mockapi.io/cart/${findItem.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'
                 },
-                body: JSON.stringify({ id }),
+                body: JSON.stringify({ id: findItem.id }),
             })
-            setItemsInCart(prev => prev.filter(item => Number(item.id) !== Number(id)));
         } else {
+            setItemsInCart(prev => [...prev, elem]);
+
             fetch('https://6117822b30022f0017a05e3f.mockapi.io/cart', {
                 method: 'POST',
                 headers: {
@@ -44,13 +48,22 @@ const ShopContextProvider = ({ children }) => {
                 body: JSON.stringify(elem)
             })
                 .then(res => res.json())
-                .then(elem => setItemsInCart(prev => [...prev, elem]))
-                .catch(() => alert('Не удалось добавить в корзину'))
-            // setItemsInCart(prev => [...prev, elem]);
+                .then(elem => setItemsInCart(prev => prev.map(item => {
+                    if (item.parentId === elem.parentId) {
+                        return {
+                            ...item,
+                            id: elem.id
+                        };
+                    }
+                    return item;
+                })))
+                .catch(() => alert('Не удалось добавить в корзину'));
         }
     }
 
     const removeFromCart = (id) => {
+        setItemsInCart(prev => prev.filter(elem => Number(elem.id) !== Number(id)));
+
         fetch(`https://6117822b30022f0017a05e3f.mockapi.io/cart/${id}`, {
             method: 'DELETE',
             headers: {
@@ -58,22 +71,26 @@ const ShopContextProvider = ({ children }) => {
             },
             body: JSON.stringify({ id })
         })
-        setItemsInCart(prev => prev.filter(elem => elem.id !== id));
     }
 
     const addToFavourites = (elem) => {
         const id = elem.id;
 
-        if (itemsInFavourites.find(item => item.id === id)) {
-            fetch(`https://6117822b30022f0017a05e3f.mockapi.io/favourites/${id}`, {
+        const findItem = itemsInFavourites.find(item => Number(item.parentId) === Number(id));
+
+        if (findItem) {
+            setItemsInFavourites(prev => prev.filter(item => Number(item.parentId) !== Number(id)));
+
+            fetch(`https://6117822b30022f0017a05e3f.mockapi.io/favourites/${findItem.id}`, {
                 method: 'DELETE',
                 headers: {
                     'Content-Type': 'application/json;charset=utf-8'
                 },
-                body: JSON.stringify({ id }),
+                body: JSON.stringify({ id: findItem.id }),
             })
-            setItemsInFavourites(prev => prev.filter(item => item.id !== id));
         } else {
+            setItemsInFavourites(prev => [...prev, elem]);
+
             fetch('https://6117822b30022f0017a05e3f.mockapi.io/favourites', {
                 method: 'POST',
                 headers: {
@@ -82,31 +99,48 @@ const ShopContextProvider = ({ children }) => {
                 body: JSON.stringify(elem)
             })
                 .then(res => res.json())
-                .then(elem => setItemsInFavourites(prev => [...prev, elem]))
-                .catch(() => alert('Не удалось добавить в фавориты'))
+                .then(elem => setItemsInFavourites(prev => prev.map(item => {
+                    if (item.parentId === elem.parentId) {
+                        return {
+                            ...item,
+                            id: elem.id
+                        };
+                    }
+                    return item;
+                })))
+                .catch(() => alert('Не удалось добавить в фавориты'));
         }
     }
 
     const isItemAdded = (id) => {
-        return itemsInCart.some(item => Number(item.id) === Number(id));
+        return itemsInCart.some(item => Number(item.parentId) === Number(id));
+    }
+
+    const isItemFavourite = (id) => {
+        return itemsInFavourites.some(item => Number(item.parentId) === Number(id));
     }
 
     useEffect(() => {
         async function fetchData() {
-            const responseCart = await fetch('https://6117822b30022f0017a05e3f.mockapi.io/cart')
-            const itemsInCartFromServer = await responseCart.json();
+            try {
+                const [responseCart, responseFavourites, responseItems] = await Promise.all([
+                    fetch('https://6117822b30022f0017a05e3f.mockapi.io/cart'),
+                    fetch('https://6117822b30022f0017a05e3f.mockapi.io/favourites'),
+                    fetch('https://6117822b30022f0017a05e3f.mockapi.io/items'),
+                ]);
 
-            const responseFavourites = await fetch('https://6117822b30022f0017a05e3f.mockapi.io/favourites')
-            const itemsInFavouritesFromServer = await responseFavourites.json();
+                const itemsInCartFromServer = await responseCart.json();
+                const itemsInFavouritesFromServer = await responseFavourites.json();
+                const itemsFromServer = await responseItems.json();
 
-            const responseItems = await fetch('https://6117822b30022f0017a05e3f.mockapi.io/items')
-            const itemsFromServer = await responseItems.json();
+                setIsLoading(false);
 
-            setIsLoading(false);
-
-            setItemsInCart(itemsInCartFromServer);
-            setItemsInFavourites(itemsInFavouritesFromServer);
-            setItems(itemsFromServer);
+                setItemsInCart(itemsInCartFromServer);
+                setItemsInFavourites(itemsInFavouritesFromServer);
+                setItems(itemsFromServer);
+            } catch (error) {
+                alert('Ошибка при запросе данных с сервера');
+            }
         }
 
         fetchData();
@@ -127,6 +161,7 @@ const ShopContextProvider = ({ children }) => {
             removeFromCart,
             addToFavourites,
             isItemAdded,
+            isItemFavourite,
             setItemsInCart,
             setIsCartOpened,
         }} >

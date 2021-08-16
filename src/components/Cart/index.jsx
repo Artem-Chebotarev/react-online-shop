@@ -1,13 +1,16 @@
 import { useState } from "react";
 import { useShopContext } from "../../context/shopContext";
+import { useCart } from "../customHooks/useCart";
 import Info from "../Info/Info";
 
 import styles from './Cart.module.scss';
 
 const delay = (ms) => new Promise(resolve => setTimeout(() => resolve(), ms));
 
-function Cart({ handleCart }) {
-    const { itemsInCart, removeFromCart, setItemsInCart } = useShopContext();
+function Cart({ handleCart, opened }) {
+    const { itemsInCart, setItemsInCart, totalPrice } = useCart();
+
+    const { removeFromCart } = useShopContext();
 
     const [isOrderComplete, setIsOrderComplete] = useState(false);
     const [orderId, setOrderId] = useState(null);
@@ -39,7 +42,7 @@ function Cart({ handleCart }) {
                 },
                 body: JSON.stringify({ id: item.id })
             });
-            
+
             /* из-за ограничения количества запросов в секунду у mockapi нужно сделать задержку */
             await delay(500);
         }
@@ -50,7 +53,7 @@ function Cart({ handleCart }) {
 
 
     return (
-        <div className={`${styles.overlay} ${true ? styles.overlayVisible : ''}`}>
+        <div className={`${styles.overlay} ${opened ? styles.overlayVisible : ''}`}>
             <div className={styles.cart}>
                 <h2 className="d-flex justify-between mb-30">
                     Корзина<img className="cu-p" onClick={handleCart} src="/img/btn-remove.svg" alt="Close" />
@@ -58,9 +61,9 @@ function Cart({ handleCart }) {
                 {
                     itemsInCart.length ?
                         <>
-                            <div className="items">
-                                {itemsInCart.map(elem =>
-                                    <div className="cartItem d-flex align-center mb-20" key={elem.id}>
+                            <div className="items flex">
+                                {itemsInCart.map((elem, index) =>
+                                    <div className="cartItem d-flex align-center mb-20" key={index}>
                                         <div
                                             style={{ backgroundImage: `url(${elem.imageUrl}` }}
                                             className="cartItemImg">
@@ -78,12 +81,12 @@ function Cart({ handleCart }) {
                                     <li>
                                         <span>Итого:</span>
                                         <div></div>
-                                        <b>21 498 руб.</b>
+                                        <b>{totalPrice} руб.</b>
                                     </li>
                                     <li>
                                         <span>Налог 5%</span>
                                         <div></div>
-                                        <b>1074 руб.</b>
+                                        <b>{Math.round(totalPrice / 100 * 5)} руб.</b>
                                     </li>
                                 </ul>
                                 <button disabled={isLoading} onClick={onClickOrder} className="greenButton">Оформить заказ <img src="/img/arrow.svg" alt="Arrow" /></button>

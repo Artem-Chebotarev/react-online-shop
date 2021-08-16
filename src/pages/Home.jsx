@@ -12,8 +12,8 @@ function Home() {
                 key={index}
                 {...elem}
                 loading={isLoading}
-                addToCart={() => addToCart(elem)}
-                addToFavourites={() => addToFavourites(elem)}
+                addToCart={(item) => addToCart(item)}
+                addToFavourites={(item) => addToFavourites(item)}
             />
         ));
     }

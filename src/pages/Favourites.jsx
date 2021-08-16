@@ -1,8 +1,17 @@
+import { useEffect, useState } from "react";
 import Card from "../components/Card";
 import { useShopContext } from "../context/shopContext";
 
 function Favourites() {
-    const { itemsInFavourites, addToCart, addToFavourites } = useShopContext();
+    const { addToCart, addToFavourites } = useShopContext();
+
+    const [ itemsInFavourites, setItemsInFavourites] = useState([]);
+
+    useEffect(() => {
+        fetch('https://6117822b30022f0017a05e3f.mockapi.io/favourites')
+            .then(res => res.json())
+            .then(itemsInFavouritesFromServer => setItemsInFavourites(itemsInFavouritesFromServer))
+    }, []);
 
     return (
         <div className="content p-40">
@@ -13,15 +22,15 @@ function Favourites() {
                 {
                     itemsInFavourites.length ?
                         itemsInFavourites
-                            .map(elem => <Card
-                                key={elem.id}
-                                addToCart={() => addToCart(elem)}
-                                isInFavourites={true}
-                                addToFavourites={() => addToFavourites(elem)}
+                            .map((elem, index) => <Card
+                                key={index}
+                                addToCart={(item) => addToCart(item)}
+                                isItemFavourite={true}
+                                addToFavourites={(item) => addToFavourites(item)}
                                 {...elem}
                             />)
                         :
-                        <p>в закладках нет кроссовок</p>
+                        <p>В закладках нет кроссовок</p>
                 }
             </div>
         </div>
