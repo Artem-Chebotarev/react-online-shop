@@ -1,8 +1,8 @@
 {
   "files": {
     "main.css": "/react-online-shop/static/css/main.29d61c48.chunk.css",
-    "main.js": "/react-online-shop/static/js/main.e1a855d8.chunk.js",
-    "main.js.map": "/react-online-shop/static/js/main.e1a855d8.chunk.js.map",
+    "main.js": "/react-online-shop/static/js/main.a4c03b26.chunk.js",
+    "main.js.map": "/react-online-shop/static/js/main.a4c03b26.chunk.js.map",
     "runtime-main.js": "/react-online-shop/static/js/runtime-main.f2fd8cc1.js",
     "runtime-main.js.map": "/react-online-shop/static/js/runtime-main.f2fd8cc1.js.map",
     "static/css/2.1cdcfe91.chunk.css": "/react-online-shop/static/css/2.1cdcfe91.chunk.css",
@@ -18,6 +18,6 @@
     "static/css/2.1cdcfe91.chunk.css",
     "static/js/2.863a0a2f.chunk.js",
     "static/css/main.29d61c48.chunk.css",
-    "static/js/main.e1a855d8.chunk.js"
+    "static/js/main.a4c03b26.chunk.js"
   ]
 }
