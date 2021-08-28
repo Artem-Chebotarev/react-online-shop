@@ -1,4 +1,4 @@
-# [react-online-shop](https://artem-chebotarev.github.io/react-online-shop/) || Интернет-магазин кроссовок
+# [react-online-shop](https://artem-chebotarev.github.io/react-online-shop/) || Интернет-магазин кроссово
 
 <p align="center">
   <img src="start-page.png" width="950" alt="accessibility text">
